@@ -36,42 +36,54 @@ def dashboard(request):
         request.session['user_id']
     except KeyError:
         return redirect('/')
-    context={}
+    user_id=request.session['user_id']
+    context={
+        'user':User.objects.get(id=user_id),
+        'schedules':Plan.objects.filter(planner_id=user_id),
+        'others':Plan.objects.exclude(planner_id=user_id),
+    }
     return render(request, 'travel_buddy/dashboard.html',context)
 
+def delete(request,plan_id):
+    cancelplan=User.objects.get(id=request.session['user_id']).plans.remove(Plan.objects.get(id=plan_id))
+    print delete_review
+    return redirect('/reviews/{}'.format(book_id))
+#<--- Process Add Review --->#
+
+def join(request,plan_id):
+    joinplan= User.objects.get(id=request.session['user_id']).plans.add(Plan.objects.get(id=plan_id))
+    return redirect('/dashboard')
+#<--- User Info Page --->#
+
 def addplan(request):
-    # #<--- Check if logged in/in session --->
-    # try:
-    #     request.session['user_id']
-    # except KeyError:
-    #     return redirect('/')
-    #
-    # context={
-    #     'authors':Author.objects.all()
-    # }
+    #<--- Check if logged in/in session --->
+    try:
+        request.session['user_id']
+    except KeyError:
+        return redirect('/')
+
     return render(request, 'travel_buddy/addplan.html')
+
 def processplan(request):
-    # errors= Review.objects.validate_newreview(request.POST,request.session['user_id'])
+    # errors= Review.objects.validate_plan(request.POST,request.session['user_id'])
     # if len(errors):
     #     for field, message in errors.iteritems():
     #         error(request, message, extra_tags=field)
-    #     return redirect('/addbook')
+    #     return redirect('/addplan')
     #
     # else:
-    #     new_author= Author.objects.create_author(request.POST)
-    #     new_book= Book.objects.create_book(request.POST,new_author.id)
-    #     newentry= Review.objects.add_review(request.POST,new_book.id,request.session['user_id'])
+        new_plan= Plan.objects.add_plan(request.POST,request.session['user_id'])
 
         return redirect('/dashboard')
-#<--- Book Review Page --->#
 
-def destination(request,user_id):
-    # user= User.objects.get(id=user_id)
-    # context={
-    #     'user':user,
-    #     'reviewedbooks':Review.objects.filter(reviewer_id=user.id)
-    # }
-    return render(request, 'travel_buddy/destination.html')
+def destination(request,plan_id):
+    plan= Plan.objects.get(id=plan_id)
+    companions=Plan.objects.exclude(planner_id=request.session['user_id'])
+    context={
+        'plan':plan,
+        'companions':companions,
+    }
+    return render(request, 'travel_buddy/destination.html',context)
 #<--- Process Logout --->#
 def logout(request):
     del request.session['user_id']

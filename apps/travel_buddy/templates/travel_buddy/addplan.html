@@ -19,14 +19,14 @@
         <p>{{ k }}</p>
           {% endfor %}
         {% endif %}
-        <form action="/processtrip" method="post">
+        <form action="/processplan" method="post">
         {% csrf_token %}
           <p>Destination <input type="text" name="dest"></p>
           <p>Description:
             <textarea name="desc" cols="50" rows="5"></textarea>
           </p>
-          <p>Travel Date From: <input type="text" name="start" placeholder="YEAR, DAY, MONTH"></p>
-          <p>Travel Date To: <input type="text" name="end" placeholder="YEAR, DAY, MONTH"></p>
+          <p>Travel Date From: <input type="text" name="start" placeholder="YYYY-MM-DD"></p>
+          <p>Travel Date To: <input type="text" name="end" placeholder="YYYY-MM-DD"></p>
           <p><input type="submit" value="Add"></p>
         </form>
       </div>

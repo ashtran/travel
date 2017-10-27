@@ -10,16 +10,17 @@
 
       <div class="title">
         <p><a href="/dashboard">Home</a>  <a href="/logout">Logout</a></p>
-        <h2>Planned By: {{user.name}}!</h2>
-        <p>Description: {{user.desc}}</p>
-        <p>Travel Date From: {{user.start}}</p>
-        <p>Travel Date To: {{user.end}}</p>
+        <h2>Destination: {{plan.dest}}</h2>
+        <p>Planned By: {{plan.planner.name}}</p>
+        <p>Description: {{plan.desc}}</p>
+        <p>Travel Date From: {{plan.start}}</p>
+        <p>Travel Date To: {{plan.end}}</p>
       </div>
 
       <div class="reviews">
         <h3>Other users' joining the trip:</h3>
         {% for k in companions %}
-          <p>{{k.name}</a></p>
+          <p>{{k.name}}</a></p>
         {% endfor %}
       </div>
 

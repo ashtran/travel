@@ -81,15 +81,15 @@ class User(models.Model):
 class PlanManager(models.Manager):
     def validate_plan(self,post_data,plan_id,user_id):
         errors={}
-        # today= datetime.now().date
-        # tomorrow= today+ timedelta(1)
-        # min_start=datetime.combine(today, time())
-        # min_end=datetime.combine(tomorrow, time())
-        # for field,value in post_data.iteritems():
-        #     # <- Blank Field -> #
-        #     if len(value)<1:
-        #         errors[field]="{} field is required".format(field.replace('_',' '))
-        #     # <- Trip Future -> #
+        today= datetime.now().date
+        tomorrow= today+ timedelta(1)
+        min_start=datetime.combine(today, time())
+        min_end=datetime.combine(tomorrow, time())
+        for field,value in post_data.iteritems():
+            # <- Blank Field -> #
+            if len(value)<1:
+                errors[field]="{} field is required".format(field.replace('_',' '))
+            # <- Trip Future -> #
         #     elif field == "start":
         #         start_date= self.order_by('-start').filter(=min_start).filter(=min_end)
         #         if not field in errors and dates>0:
@@ -97,18 +97,15 @@ class PlanManager(models.Manager):
         #     # <- Trip Future -> #
         #     elif field == "end":
         #         end_dates= self.order_by('-end').filter(start__gte=min_end).filter(start__gte__lt=min_end)
-        #         if not field in errors and len(Book.objects.filter(end=post_data['end']))> 0:
-        #             errors[field]= "Book has already been submitted"
-        return errors
+        # return errors
 
-    def add_plan(self,post_data,planner_id,companion_id):
+    def add_plan(self,post_data,planner_id):
         new_plan= self.create(
             dest= post_data['dest'],
             desc= post_data['desc'],
             start= post_data['start'],
             end= post_data['end'],
             planner_id=planner_id,
-            companion_id=companion_id,
         )
         return new_plan
 
@@ -123,7 +120,7 @@ class Plan(models.Model):
     updated_at= models.DateTimeField(auto_now=True)
 
     planner=models.ForeignKey(User, related_name="user_plans", null=True)
-    companions=models.ManyToManyField(User, related_name="plans", null=True)
+    companions=models.ManyToManyField(User, related_name="plans", default="")
     objects = PlanManager()
     # <- Print class attributes -> #
     def __repr__(self):
