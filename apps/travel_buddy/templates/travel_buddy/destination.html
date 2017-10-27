@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang= "en">
+  <head>
+    <meta charset="utf-8">
+    <title>Destination</title>
+    <meta name="description" content= "Insert description of webpage">
+  </head>
+  <body>
+    <div id="container">
+
+      <div class="title">
+        <p><a href="/dashboard">Home</a>  <a href="/logout">Logout</a></p>
+        <h2>Planned By: {{user.name}}!</h2>
+        <p>Description: {{user.desc}}</p>
+        <p>Travel Date From: {{user.start}}</p>
+        <p>Travel Date To: {{user.end}}</p>
+      </div>
+
+      <div class="reviews">
+        <h3>Other users' joining the trip:</h3>
+        {% for k in companions %}
+          <p>{{k.name}</a></p>
+        {% endfor %}
+      </div>
+
+    </div>
+  </body>
+</html>
