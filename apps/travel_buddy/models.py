@@ -27,7 +27,7 @@ class UserManager(models.Manager):
 # <--- Validate User Registration---> #
     def validate_registration(self,post_data):
         errors={}
-        for field,value in post_data.iteritems():
+        for field,value in post_data.items():
             # <- Blank Entry -> #
             if len(value)<1:
                 errors[field]="{} field is required".format(field.replace('_',' '))
@@ -79,25 +79,21 @@ class User(models.Model):
 
 
 class PlanManager(models.Manager):
-    def validate_plan(self,post_data,plan_id,user_id):
+    def validate_plan(self,post_data):
         errors={}
-        today= datetime.now().date
-        tomorrow= today+ timedelta(1)
-        min_start=datetime.combine(today, time())
-        min_end=datetime.combine(tomorrow, time())
-        for field,value in post_data.iteritems():
+        for field,value in post_data.items():
             # <- Blank Field -> #
             if len(value)<1:
                 errors[field]="{} field is required".format(field.replace('_',' '))
             # <- Trip Future -> #
-        #     elif field == "start":
-        #         start_date= self.order_by('-start').filter(=min_start).filter(=min_end)
-        #         if not field in errors and dates>0:
-        #             errors[field]= "Travel Date from should be Future Dated"
-        #     # <- Trip Future -> #
-        #     elif field == "end":
-        #         end_dates= self.order_by('-end').filter(start__gte=min_end).filter(start__gte__lt=min_end)
-        # return errors
+            if field == "start":
+                if not field in errors and datetime.strptime(post_data[field], '%Y-%m-%d').date() < datetime.today().date():
+                    errors[field]= "Travel Date from should be Future Dated"
+            # <- Trip Future -> #
+            elif field == "end":
+                if not field in errors and datetime.strptime(post_data[field], '%Y-%m-%d').date() < datetime.strptime(post_data['end'], '%Y-%m-%d').date():
+                    errors[field]= "Travel End Date must be after Start Date"
+        return errors
 
     def add_plan(self,post_data,planner_id):
         new_plan= self.create(
@@ -107,7 +103,13 @@ class PlanManager(models.Manager):
             end= post_data['end'],
             planner_id=planner_id,
         )
+
         return new_plan
+
+    def join_plan(self,plan_id,user_id):
+        join_plan=self.get(id=plan_id).companions.add(User.objects.get(id=user_id))
+
+        return join_plan
 
 class Plan(models.Model):
 # <--- Plan attributes ---> #
@@ -124,4 +126,4 @@ class Plan(models.Model):
     objects = PlanManager()
     # <- Print class attributes -> #
     def __repr__(self):
-        return "id:{} dest:{} desc:{} start:{} end:{} created_at:{} planner:{} companion:{}".format(self.id,self.dest, self.desc,self.start,self.end,self.created_at,self.planner_id,self.companion_id)
+        return "id:{} dest:{} desc:{} start:{} end:{} created_at:{} planner:{}".format(self.id,self.dest, self.desc,self.start,self.end,self.created_at,self.planner_id)

@@ -26,8 +26,8 @@
         {% for k in schedules %}
           <tr>
             <td><a href="/destination/{{k.id}}">{{k.dest}}</a></td>
-            <td>{{k.start}}</td>
-            <td>{{k.end}}</td>
+            <td>{{k.start | date:"M. d. Y"}}</td>
+            <td>{{k.end | date:"M. d. Y"}}</td>
             <td>{{k.desc}}</td>
           </tr>
         {% endfor %}
@@ -46,10 +46,10 @@
           </tr>
         {% for k in others %}
           <tr>
-            <td>{{k.name}}</td>
+            <td>{{k.planner.name}}</td>
             <td><a href="/destination/{{k.id}}">{{k.dest}}</a></td>
-            <td>{{k.start}}</td>
-            <td>{{k.end}}</td>
+            <td>{{k.start | date:"M. d. Y"}}</td>
+            <td>{{k.end | date:"M. d. Y"}}</td>
             <td><a href='/dashboard/{{k.id}}/add'>Join</a></td>
           </tr>
         {% endfor %}

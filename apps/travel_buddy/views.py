@@ -11,7 +11,7 @@ def index(request):
 def createuser(request):
     errors= User.objects.validate_registration(request.POST)
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request, message, extra_tags=field)
         return redirect('/')
     else:
@@ -22,16 +22,16 @@ def createuser(request):
 def login(request):
     errors= User.objects.validate_login(request.POST)
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request, message, extra_tags=field)
         return redirect('/')
     else:
         user= User.objects.filter(username=request.POST['username'])[0]
         request.session['user_id']=user.id
         return redirect('/dashboard')
+
 #<--- User Dashboard --->#
 def dashboard(request):
-    #<--- Check if logged in/in session --->
     try:
         request.session['user_id']
     except KeyError:
@@ -39,21 +39,22 @@ def dashboard(request):
     user_id=request.session['user_id']
     context={
         'user':User.objects.get(id=user_id),
-        'schedules':Plan.objects.filter(planner_id=user_id),
-        'others':Plan.objects.exclude(planner_id=user_id),
+        'schedules':Plan.objects.filter(companions=request.session['user_id']),
+        'others':Plan.objects.all().exclude(companions=user_id),
     }
     return render(request, 'travel_buddy/dashboard.html',context)
 
 def delete(request,plan_id):
     cancelplan=User.objects.get(id=request.session['user_id']).plans.remove(Plan.objects.get(id=plan_id))
-    print delete_review
+    print (delete_review)
     return redirect('/reviews/{}'.format(book_id))
-#<--- Process Add Review --->#
 
+
+#<--- Process Join Plan --->#
 def join(request,plan_id):
-    joinplan= User.objects.get(id=request.session['user_id']).plans.add(Plan.objects.get(id=plan_id))
+    join_plan= Plan.objects.join_plan(plan_id,request.session['user_id'])
     return redirect('/dashboard')
-#<--- User Info Page --->#
+
 
 def addplan(request):
     #<--- Check if logged in/in session --->
@@ -65,20 +66,21 @@ def addplan(request):
     return render(request, 'travel_buddy/addplan.html')
 
 def processplan(request):
-    # errors= Review.objects.validate_plan(request.POST,request.session['user_id'])
-    # if len(errors):
-    #     for field, message in errors.iteritems():
-    #         error(request, message, extra_tags=field)
-    #     return redirect('/addplan')
-    #
-    # else:
+    errors= Plan.objects.validate_plan(request.POST)
+    if len(errors):
+        for field, message in errors.items():
+            error(request, message, extra_tags=field)
+        return redirect('/addplan')
+
+    else:
         new_plan= Plan.objects.add_plan(request.POST,request.session['user_id'])
+        join_plan= Plan.objects.join_plan(new_plan.id,request.session['user_id'])
 
         return redirect('/dashboard')
 
 def destination(request,plan_id):
     plan= Plan.objects.get(id=plan_id)
-    companions=Plan.objects.exclude(planner_id=request.session['user_id'])
+    companions=Plan.objects.get(id=plan_id).companions.exclude(id=request.session['user_id']).exclude(id=plan.planner_id)
     context={
         'plan':plan,
         'companions':companions,

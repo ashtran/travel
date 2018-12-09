@@ -13,11 +13,11 @@
         <h2>Destination: {{plan.dest}}</h2>
         <p>Planned By: {{plan.planner.name}}</p>
         <p>Description: {{plan.desc}}</p>
-        <p>Travel Date From: {{plan.start}}</p>
-        <p>Travel Date To: {{plan.end}}</p>
+        <p>Travel Date From: {{plan.start | date:"M. d. Y"}}</p>
+        <p>Travel Date To: {{plan.end | date:"M. d. Y"}}</p>
       </div>
 
-      <div class="reviews">
+      <div class="others">
         <h3>Other users' joining the trip:</h3>
         {% for k in companions %}
           <p>{{k.name}}</a></p>
